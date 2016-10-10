@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Unity Google VR / Cardboard photosphere example
 
 A simple Unity project template for viewing photospheres / 360-degree photos using Google VR (aka Cardboard) devices.
@@ -44,3 +45,6 @@ The code is provided under the Apache License, Version 2.0.
 The "Double Arch Photosphere" by Mark Doliner (https://www.flickr.com/photos/markdoliner/14094296347) is under a Creative Commons Attribution 2.0 Generic License [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
 
 The `LyonvilleSpring__AndrewPerry__PublicDomain` image is provided under a [CC0 license](https://creativecommons.org/publicdomain/zero/1.0/), and is dedicated to the public domain.
+=======
+# photoSphere
+>>>>>>> 73346abe77e3287381bd9229628e28acdcd1802f
