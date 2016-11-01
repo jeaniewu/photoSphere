@@ -11,6 +11,8 @@ public class TextureLoader : MonoBehaviour {
 
 	public Texture2D[] imageBuffer = new Texture2D[10];
 
+	public GameObject[] spheres;
+
 	// Use this for initialization
 	void Start () {
 		pathImageAssets = Application.dataPath;
@@ -27,7 +29,7 @@ public class TextureLoader : MonoBehaviour {
 	{
 
 		//create filename index suffix "001",...,"027" (could be "999" either)
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 4; i++) {
 			string indexSuffix = "";
 			float logIdx = Mathf.Log10 (i + 1);
 			if (logIdx < 1.0)
@@ -44,6 +46,10 @@ public class TextureLoader : MonoBehaviour {
 			//LoadImageIntoTexture compresses JPGs by DXT1 and PNGs by DXT5     
 			www.LoadImageIntoTexture (texTmp);
 			imageBuffer[i] = texTmp;
+
+
+			spheres[i].GetComponent<Renderer> ().material.mainTexture = texTmp;
+
 		}
 	}
 }
