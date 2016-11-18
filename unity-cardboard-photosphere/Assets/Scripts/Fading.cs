@@ -30,17 +30,9 @@ public class Fading : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerEnter(Collider other) {		
-		if (other.CompareTag("Sphere")){
-			StartCoroutine (beginFade());
-			other.GetComponentInChildren<AudioSource> ().Play ();
-		}
-	}
-
-	void OnTriggerExit(Collider other) {
-		if (other.CompareTag("Sphere")){
-			StartCoroutine (beginFade());
-			other.GetComponentInChildren<AudioSource> ().Stop ();
-		}
-	}
+//	void OnTriggerEnter(Collider other) {		
+//		if (other.CompareTag("Sphere")){
+//			StartCoroutine (beginFade());
+//		}
+//	}
 }

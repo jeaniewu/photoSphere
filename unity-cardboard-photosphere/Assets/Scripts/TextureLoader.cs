@@ -47,9 +47,9 @@ public class TextureLoader : MonoBehaviour {
 			www.LoadImageIntoTexture (texTmp);
 			imageBuffer[i] = texTmp;
 
-
-			spheres[i].GetComponent<Renderer> ().material.mainTexture = texTmp;
-
+			if (i < spheres.Length) {
+				spheres[i].GetComponent<Renderer> ().material.mainTexture = texTmp;
+			}
 		}
 	}
 }
