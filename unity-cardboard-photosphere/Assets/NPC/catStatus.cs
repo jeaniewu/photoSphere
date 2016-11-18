@@ -6,6 +6,9 @@ public class catStatus : MonoBehaviour {
 
 	//Animation talk;
 	Animator thisAnim;
+    TextBoxAdder tbAdder;
+    double timePassed;
+    bool isTalking;
 
 	// Use this for initialization
 	void Start () {
@@ -13,6 +16,8 @@ public class catStatus : MonoBehaviour {
 		//talk ["talk"].wrapMode = WrapMode.Loop;
 
 		thisAnim = GetComponent<Animator> ();
+        tbAdder = GetComponent<TextBoxAdder>();
+        timePassed = 0;
 	}
 
 	// Update is called once per frame
@@ -27,7 +32,24 @@ public class catStatus : MonoBehaviour {
 			}*/
 
 			thisAnim.CrossFade("talk", 0f);
+            tbAdder.gotoNextSentence();
+            timePassed = 0;
+            isTalking = true;
 		}
+
+        if (isTalking)
+        {
+            timePassed += Time.deltaTime;
+
+            if (timePassed > 3.0f)
+            {
+                isTalking = false;
+                thisAnim.CrossFade("default", 0f);
+                timePassed = 0;
+            }
+        }
+
+        
 	else if (Input.GetKeyDown("space")) {
 			thisAnim.CrossFade ("default", 0f);
 		}

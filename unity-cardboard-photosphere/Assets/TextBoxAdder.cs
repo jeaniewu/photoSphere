@@ -24,7 +24,7 @@ public class TextBoxAdder : MonoBehaviour {
         boxTextTextMesh.text = newText;
     }
 
-    void gotoNextSentence()
+    public bool gotoNextSentence()
     {
         currentSentence++;
         if (currentSentence > sentences.Length - 1)
@@ -49,6 +49,15 @@ public class TextBoxAdder : MonoBehaviour {
             newCurrentTextBoxController.FadeInTextBox();
 
 
+        }
+
+
+        if (currentSentence != -1)
+        {
+            return true;
+        } else
+        {
+            return false;
         }
     }
     
