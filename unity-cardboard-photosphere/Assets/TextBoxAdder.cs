@@ -34,14 +34,13 @@ public class TextBoxAdder : MonoBehaviour {
             currentTextBoxController.FadeOutTextBox();
         } else
         {
-            if (currentSentence == 0)
-            {
-                currentTextBox = (GameObject)Instantiate(textBox, this.transform);
-                currentTextBox.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + 12f, this.transform.position.z);
-            }
+            
 
-            TextboxController currentTextBoxController = currentTextBox.GetComponent<TextboxController>();
-            currentTextBoxController.FadeOutTextBox();
+            if (currentSentence != 0)
+            {
+                TextboxController currentTextBoxController = currentTextBox.GetComponent<TextboxController>();
+                currentTextBoxController.FadeOutTextBox();
+            }
             currentTextBox = (GameObject)Instantiate(textBox, this.transform);
             currentTextBox.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + 12f, this.transform.position.z);
             setTextOfCurrentTextBox(sentences[currentSentence]);

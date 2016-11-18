@@ -19,8 +19,16 @@ public class TextboxController : MonoBehaviour {
             transform.position = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
             Transform spriteObjectTrans = transform.GetChild(0);
             GameObject spriteObject = spriteObjectTrans.gameObject;
+
+            Transform textObjectTrans = transform.GetChild(1);
+            GameObject textObject = textObjectTrans.gameObject;
+            MeshRenderer mr = textObject.GetComponent<MeshRenderer>();
+            Material newMaterial = mr.materials[0];
+           
             SpriteRenderer sr = spriteObject.GetComponent<SpriteRenderer>();
             sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, (float)(sr.color.a - 0.05));
+            newMaterial.color = new Color(newMaterial.color.r, newMaterial.color.g, newMaterial.color.b, (float)(newMaterial.color.a - 0.1));
+
             fadingOutTime++;
             if (fadingOutTime > 30)
             {
@@ -32,6 +40,15 @@ public class TextboxController : MonoBehaviour {
             GameObject spriteObject = spriteObjectTrans.gameObject;
             SpriteRenderer sr = spriteObject.GetComponent<SpriteRenderer>();
             sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, (float)(sr.color.a + 0.02));
+
+            Transform textObjectTrans = transform.GetChild(1);
+            GameObject textObject = textObjectTrans.gameObject;
+            MeshRenderer mr = textObject.GetComponent<MeshRenderer>();
+            Material newMaterial = mr.materials[0];
+          
+            newMaterial.color = new Color(newMaterial.color.r, newMaterial.color.g, newMaterial.color.b, (float)(newMaterial.color.a + 0.05));
+
+
             if (sr.color.a >= 1.0f)
             {
                 isFadingIn = false;
@@ -59,5 +76,13 @@ public class TextboxController : MonoBehaviour {
         GameObject spriteObject = spriteObjectTrans.gameObject;
         SpriteRenderer sr = spriteObject.GetComponent<SpriteRenderer>();
         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, 0);
+
+        Transform textObjectTrans = transform.GetChild(1);
+        GameObject textObject = textObjectTrans.gameObject;
+        MeshRenderer mr = textObject.GetComponent<MeshRenderer>();
+        Material newMaterial = mr.materials[0];
+
+        newMaterial.color = new Color(newMaterial.color.r, newMaterial.color.g, newMaterial.color.b, 0);
+
     }
 }
