@@ -107,6 +107,7 @@ public class GvrHead : MonoBehaviour {
 
     if (trackRotation) {
       var rot = GvrViewer.Instance.HeadPose.Orientation;
+	   rot.eulerAngles = new Vector3(rot.eulerAngles.x, rot.eulerAngles.y, 0);
       if (target == null) {
         transform.localRotation = rot;
       } else {
