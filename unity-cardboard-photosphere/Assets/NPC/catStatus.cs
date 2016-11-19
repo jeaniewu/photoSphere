@@ -2,58 +2,41 @@
 using System.Collections;
 
 
-public class catStatus : MonoBehaviour {
+public class catStatus : MonoBehaviour
+{
 
-	//Animation talk;
-	Animator thisAnim;
-    TextBoxAdder tbAdder;
-    double timePassed;
-    bool isTalking;
+    //Animation talk;
+    Animator thisAnim;
 
-	// Use this for initialization
-	void Start () {
-	//	talk = GetComponent<Animation>();
-		//talk ["talk"].wrapMode = WrapMode.Loop;
+    // Use this for initialization
+    void Start()
+    {
+        //	talk = GetComponent<Animation>();
+        //talk ["talk"].wrapMode = WrapMode.Loop;
 
-		thisAnim = GetComponent<Animator> ();
-        tbAdder = GetComponent<TextBoxAdder>();
-        timePassed = 0;
-	}
+        thisAnim = GetComponent<Animator>();
+    }
 
-	// Update is called once per frame
-	void Update () {
-		//AnimatorStateInfo thisState = thisAnim.GetCurrentAnimatorStateInfo (0);
+    // Update is called once per frame
+    void Update()
+    {
+        //AnimatorStateInfo thisState = thisAnim.GetCurrentAnimatorStateInfo (0);
 
-		if (Input.GetMouseButtonDown(1)) {
-			/*if (!talk.isPlaying) {
+        if (Input.GetMouseButtonDown(1))
+        {
+            /*if (!talk.isPlaying) {
 				talk.Play ("talk");
 			} else {
 				talk.Stop ();
 			}*/
 
-			thisAnim.CrossFade("talk", 0f);
-            tbAdder.gotoNextSentence();
-            timePassed = 0;
-            isTalking = true;
-		}
-
-        if (isTalking)
-        {
-            timePassed += Time.deltaTime;
-
-            if (timePassed > 3.0f)
-            {
-                isTalking = false;
-                thisAnim.CrossFade("default", 0f);
-                timePassed = 0;
-            }
+            thisAnim.CrossFade("talk", 0f);
         }
-
-        
-	else if (Input.GetKeyDown("space")) {
-			thisAnim.CrossFade ("default", 0f);
-		}
-	}
+        else if (Input.GetKeyDown("space"))
+        {
+            thisAnim.CrossFade("default", 0f);
+        }
+    }
 
 
 }
