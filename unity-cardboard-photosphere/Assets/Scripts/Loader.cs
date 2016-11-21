@@ -13,21 +13,20 @@ public class Loader : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		float logIdx = Mathf.Log10 (index + 1);
+		float logIdx = Mathf.Log10 (index);
 		if (logIdx < 1.0)
 			indexSuffix += "00";
 		else if (logIdx < 2.0)
 			indexSuffix += "0";
-		indexSuffix += (index + 1);
+		indexSuffix += index;
 
+		startLoading ();
+	}
+	
+	public void startLoading(){
 		StartCoroutine(loadImages());
 		StartCoroutine(loadAudio());
 		StartCoroutine(loadFacts());
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
 	}
 
 	public void updateIndex(int newIndex){
@@ -51,31 +50,10 @@ public class Loader : MonoBehaviour {
 	private IEnumerator loadFacts()
 	{
 		TextAsset textFile = (TextAsset) Resources.Load(textname + indexSuffix,  typeof(TextAsset));
-		facts = textFile.text.Split('\n');
-		Debug.Log (textFile.text);
+		if (textFile != null) {
+			facts = textFile.text.Split ('\n');
+		}
 		yield return null;
 	}
-
-
-//	public TextAsset textFile;
-//	public string[] textArrays;
-//
-//	// Use this for initialization
-//	void Start () {
-//		if (textFile != null)
-//		{
-//			textArrays = new string[1];
-//			textArrays = textFile.text.Split('\n');
-//		}
-//	}
-//
-//	// Update is called once per frame
-//	void Update () {
-//
-//	}
-//
-//	public void playScript(int index){
-//		GetComponent<TextBoxManager> ().textLines = new string[1];
-//		GetComponent<TextBoxManager> ().textLines = textArrays [index].Split (';');
-//	}
+		
 }
