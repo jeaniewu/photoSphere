@@ -41,7 +41,7 @@ public class TextBoxAdder : MonoBehaviour {
                 TextboxController currentTextBoxController = currentTextBox.GetComponent<TextboxController>();
                 currentTextBoxController.FadeOutTextBox();
             }
-            currentTextBox = (GameObject)Instantiate(textBox, this.transform);
+			currentTextBox = (GameObject)Instantiate(textBox, this.transform.position, this.transform.rotation);
             currentTextBox.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + 12f, this.transform.position.z);
             currentTextBox.transform.rotation = transform.rotation;
             currentTextBox.transform.Rotate(new Vector3(0, 90, 0));

@@ -4,9 +4,11 @@ using System.Collections;
 public class Loader : MonoBehaviour {
 
 	public int index = -1;
+	public string[] facts;
 
 	string filename = @"Texture_";
 	string audioname = @"Audio_";
+	string textname = @"Text_";
 	private string indexSuffix = "";
 
 	// Use this for initialization
@@ -20,6 +22,7 @@ public class Loader : MonoBehaviour {
 
 		StartCoroutine(loadImages());
 		StartCoroutine(loadAudio());
+		StartCoroutine(loadFacts());
 	}
 	
 	// Update is called once per frame
@@ -45,4 +48,34 @@ public class Loader : MonoBehaviour {
 		yield return null;
 	}
 
+	private IEnumerator loadFacts()
+	{
+		TextAsset textFile = (TextAsset) Resources.Load(textname + indexSuffix,  typeof(TextAsset));
+		facts = textFile.text.Split('\n');
+		Debug.Log (textFile.text);
+		yield return null;
+	}
+
+
+//	public TextAsset textFile;
+//	public string[] textArrays;
+//
+//	// Use this for initialization
+//	void Start () {
+//		if (textFile != null)
+//		{
+//			textArrays = new string[1];
+//			textArrays = textFile.text.Split('\n');
+//		}
+//	}
+//
+//	// Update is called once per frame
+//	void Update () {
+//
+//	}
+//
+//	public void playScript(int index){
+//		GetComponent<TextBoxManager> ().textLines = new string[1];
+//		GetComponent<TextBoxManager> ().textLines = textArrays [index].Split (';');
+//	}
 }
