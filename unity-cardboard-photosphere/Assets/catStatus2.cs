@@ -27,7 +27,7 @@ public class catStatus2 : MonoBehaviour
     {
         //AnimatorStateInfo thisState = thisAnim.GetCurrentAnimatorStateInfo (0);
 
-        if (Input.GetKeyDown(KeyCode.T))
+		if (Input.GetKeyDown(KeyCode.T) || GvrViewer.Instance.Triggered)
         {
             /*if (!talk.isPlaying) {
 				talk.Play ("talk");
