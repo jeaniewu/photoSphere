@@ -66,8 +66,8 @@ public class TextBoxAdder : MonoBehaviour {
                 TextboxController currentTextBoxController = currentTextBox.GetComponent<TextboxController>();
                 currentTextBoxController.FadeOutTextBox();
             }
-
-            currentTextBox = (GameObject)Instantiate(textBox, this.transform);
+			currentTextBox = (GameObject)Instantiate(textBox, this.transform.position, this.transform.rotation);
+			currentTextBox.transform.parent = this.transform;
             currentTextBox.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + (12f * (this.transform.localScale.y / 5)), this.transform.position.z);
             currentTextBox.transform.rotation = transform.rotation;
             currentTextBox.transform.Rotate(new Vector3(0, 90, 0));
@@ -99,4 +99,10 @@ public class TextBoxAdder : MonoBehaviour {
         }
 
     }
+
+	void OnTriggerEnter(Collider other) {		
+		if (other.CompareTag("Sphere")){
+			sentences = other.gameObject.GetComponent<Loader> ().facts;
+		}
+	}
 }

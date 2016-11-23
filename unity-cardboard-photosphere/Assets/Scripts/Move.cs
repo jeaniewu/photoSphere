@@ -8,15 +8,17 @@ public class Move : MonoBehaviour {
 	private Vector3 target;
 	public float speed = 100f;
 
-	public GameObject[] spheres;
+	public GameObject spheresObject;
 	public int index = 0;
 
+	private GameObject[] spheres;
 	private AudioController audio;
 	private Fading fade;
 
 	void Start () {
 		audio = GetComponent<AudioController> ();
 		fade = GetComponent<Fading> ();
+		spheres = spheresObject.GetComponent<LoaderController> ().spheres;
 	}
 	
 	void Update () {

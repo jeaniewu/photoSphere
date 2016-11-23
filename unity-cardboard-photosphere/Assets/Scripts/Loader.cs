@@ -4,27 +4,42 @@ using System.Collections;
 public class Loader : MonoBehaviour {
 
 	public int index = -1;
+	public string[] facts;
 
 	string filename = @"Texture_";
 	string audioname = @"Audio_";
+	string textname = @"Text_";
 	private string indexSuffix = "";
+
+	public Texture2D texture;
+	public TextAsset textFile;
+	public AudioClip narrativeClip;
 
 	// Use this for initialization
 	void Start () {
-		float logIdx = Mathf.Log10 (index + 1);
-		if (logIdx < 1.0)
-			indexSuffix += "00";
-		else if (logIdx < 2.0)
-			indexSuffix += "0";
-		indexSuffix += (index + 1);
 
-		StartCoroutine(loadImages());
-		StartCoroutine(loadAudio());
+		// Load Statically
+		this.gameObject.GetComponent<Renderer> ().material.mainTexture = texture;
+		this.gameObject.GetComponentInChildren<AudioSource> ().clip = narrativeClip;
+		if (textFile != null) {
+			facts = textFile.text.Split ('\n');
+		}
+
+		// Load Dynamically
+//		float logIdx = Mathf.Log10 (index);
+//		if (logIdx < 1.0)
+//			indexSuffix += "00";
+//		else if (logIdx < 2.0)
+//			indexSuffix += "0";
+//		indexSuffix += index;
+//
+//		startLoading ();
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
+	public void startLoading(){
+		StartCoroutine(loadImages());
+		StartCoroutine(loadAudio());
+		StartCoroutine(loadFacts());
 	}
 
 	public void updateIndex(int newIndex){
@@ -45,4 +60,13 @@ public class Loader : MonoBehaviour {
 		yield return null;
 	}
 
+	private IEnumerator loadFacts()
+	{
+		TextAsset textFile = (TextAsset) Resources.Load(textname + indexSuffix,  typeof(TextAsset));
+		if (textFile != null) {
+			facts = textFile.text.Split ('\n');
+		}
+		yield return null;
+	}
+		
 }
