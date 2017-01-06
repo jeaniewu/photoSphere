@@ -11,29 +11,29 @@ public class Loader : MonoBehaviour {
 	string textname = @"Text_";
 	private string indexSuffix = "";
 
-	public Texture2D texture;
-	public TextAsset textFile;
-	public AudioClip narrativeClip;
+//	public Texture2D texture;
+//	public TextAsset textFile;
+//	public AudioClip narrativeClip;
 
 	// Use this for initialization
 	void Start () {
 
 		// Load Statically
-		this.gameObject.GetComponent<Renderer> ().material.mainTexture = texture;
-		this.gameObject.GetComponentInChildren<AudioSource> ().clip = narrativeClip;
-		if (textFile != null) {
-			facts = textFile.text.Split ('\n');
-		}
+//		this.gameObject.GetComponent<Renderer> ().material.mainTexture = texture;
+//		this.gameObject.GetComponentInChildren<AudioSource> ().clip = narrativeClip;
+//		if (textFile != null) {
+//			facts = textFile.text.Split ('\n');
+//		}
 
 		// Load Dynamically
-//		float logIdx = Mathf.Log10 (index);
-//		if (logIdx < 1.0)
-//			indexSuffix += "00";
-//		else if (logIdx < 2.0)
-//			indexSuffix += "0";
-//		indexSuffix += index;
-//
-//		startLoading ();
+		float logIdx = Mathf.Log10 (index);
+		if (logIdx < 1.0)
+			indexSuffix += "00";
+		else if (logIdx < 2.0)
+			indexSuffix += "0";
+		indexSuffix += index;
+
+		startLoading ();
 	}
 	
 	public void startLoading(){

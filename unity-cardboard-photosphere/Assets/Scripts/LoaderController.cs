@@ -7,7 +7,7 @@ public class LoaderController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		//StartCoroutine (loader());
+		StartCoroutine (loader());
 	}
 
 	private IEnumerator loader()
