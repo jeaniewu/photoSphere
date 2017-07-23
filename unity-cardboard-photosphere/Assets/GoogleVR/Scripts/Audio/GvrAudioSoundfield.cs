@@ -20,6 +20,8 @@ using System.Collections;
 // audio sample should be in Ambix (ACN-SN3D) format.
 [AddComponentMenu("GoogleVR/Audio/GvrAudioSoundfield")]
 public class GvrAudioSoundfield : MonoBehaviour {
+  /// Denotes whether the room effects should be bypassed.
+  public bool bypassRoomEffects = true;
 
   /// Input gain in decibels.
   public float gainDb = 0.0f;
@@ -124,6 +126,39 @@ public class GvrAudioSoundfield : MonoBehaviour {
   [Range(0, 256)]
   private int soundfieldPriority = 32;
 
+  /// Sets how much this soundfield is affected by 3D spatialization calculations
+  /// (attenuation, doppler).
+  public float spatialBlend {
+    get { return soundfieldSpatialBlend; }
+    set {
+      soundfieldSpatialBlend = value;
+      if (audioSources != null) {
+        for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
+          audioSources[channelSet].spatialBlend = soundfieldSpatialBlend;
+        }
+      }
+    }
+  }
+  [SerializeField]
+  [Range(0.0f, 1.0f)]
+  private float soundfieldSpatialBlend = 0.0f;
+
+  /// Sets the Doppler scale for this soundfield.
+  public float dopplerLevel {
+    get { return soundfieldDopplerLevel; }
+    set {
+      soundfieldDopplerLevel = value;
+      if(audioSources != null) {
+        for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
+          audioSources[channelSet].dopplerLevel = soundfieldDopplerLevel;
+        }
+      }
+    }
+  }
+  [SerializeField]
+  [Range(0.0f, 5.0f)]
+  private float soundfieldDopplerLevel = 0.0f;
+
   /// Playback position in seconds.
   public float time {
     get {
@@ -174,6 +209,58 @@ public class GvrAudioSoundfield : MonoBehaviour {
   [Range(0.0f, 1.0f)]
   private float soundfieldVolume = 1.0f;
 
+  /// Volume rolloff model with respect to the distance.
+  public AudioRolloffMode rolloffMode {
+    get { return soundfieldRolloffMode; }
+    set {
+      soundfieldRolloffMode = value;
+      if (audioSources != null) {
+        for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
+          audioSources[channelSet].rolloffMode = soundfieldRolloffMode;
+          if (rolloffMode == AudioRolloffMode.Custom) {
+            // Custom rolloff is not supported, set the curve for no distance attenuation.
+            audioSources[channelSet].SetCustomCurve(
+                AudioSourceCurveType.CustomRolloff,
+                AnimationCurve.Linear(soundfieldMinDistance, 1.0f, soundfieldMaxDistance, 1.0f));
+          }
+        }
+      }
+    }
+  }
+  [SerializeField]
+  private AudioRolloffMode soundfieldRolloffMode = AudioRolloffMode.Logarithmic;
+
+  /// MaxDistance is the distance a sound stops attenuating at.
+  public float maxDistance {
+    get { return soundfieldMaxDistance; }
+    set {
+      soundfieldMaxDistance = Mathf.Clamp(value, soundfieldMinDistance + GvrAudio.distanceEpsilon,
+                                          GvrAudio.maxDistanceLimit);
+      if (audioSources != null) {
+        for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
+          audioSources[channelSet].maxDistance = soundfieldMaxDistance;
+        }
+      }
+    }
+  }
+  [SerializeField]
+  private float soundfieldMaxDistance = 500.0f;
+
+  /// Within the Min distance the GvrAudioSource will cease to grow louder in volume.
+  public float minDistance {
+    get { return soundfieldMinDistance; }
+    set {
+      soundfieldMinDistance = Mathf.Clamp(value, 0.0f, GvrAudio.minDistanceLimit);
+      if (audioSources != null) {
+        for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
+          audioSources[channelSet].minDistance = soundfieldMinDistance;
+        }
+      }
+    }
+  }
+  [SerializeField]
+  private float soundfieldMinDistance = 1.0f;
+
   // Unique source id.
   private int id = -1;
 
@@ -195,12 +282,16 @@ public class GvrAudioSoundfield : MonoBehaviour {
     for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
       GameObject channelSetObject = new GameObject("Channel Set " + channelSet);
       channelSetObject.transform.parent = gameObject.transform;
+      channelSetObject.transform.localPosition = Vector3.zero;
+      channelSetObject.transform.localRotation = Quaternion.identity;
       channelSetObject.hideFlags = HideFlags.HideAndDontSave;
       audioSources[channelSet] = channelSetObject.AddComponent<AudioSource>();
       audioSources[channelSet].enabled = false;
       audioSources[channelSet].playOnAwake = false;
       audioSources[channelSet].bypassReverbZones = true;
-      audioSources[channelSet].spatialBlend = 0.0f;
+#if UNITY_5_5_OR_NEWER
+      audioSources[channelSet].spatializePostEffects = true;
+#endif  // UNITY_5_5_OR_NEWER
       audioSources[channelSet].outputAudioMixerGroup = mixer.FindMatchingGroups("Master")[0];
     }
     OnValidate();
@@ -210,7 +301,7 @@ public class GvrAudioSoundfield : MonoBehaviour {
     for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
       audioSources[channelSet].enabled = true;
     }
-    if (playOnAwake && !isPlaying) {
+    if (playOnAwake && !isPlaying && InitializeSoundfield()) {
       Play();
     }
   }
@@ -234,13 +325,27 @@ public class GvrAudioSoundfield : MonoBehaviour {
     }
   }
 
+  void OnApplicationPause (bool pauseStatus) {
+    if (pauseStatus) {
+      Pause();
+    } else {
+      UnPause();
+    }
+  }
+
   void Update () {
     // Update soundfield.
     if (!isPlaying && !isPaused) {
       Stop();
     } else {
-      GvrAudio.UpdateAudioSoundfield(id, transform, gainDb);
+      for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
+        audioSources[channelSet].SetSpatializerFloat((int) GvrAudio.SpatializerData.Gain,
+                                                     GvrAudio.ConvertAmplitudeFromDb(gainDb));
+        audioSources[channelSet].SetSpatializerFloat((int) GvrAudio.SpatializerData.MinDistance,
+                                                     soundfieldMinDistance);
+      }
     }
+    GvrAudio.UpdateAudioSoundfield(id, this);
   }
 
   void OnValidate () {
@@ -250,7 +355,12 @@ public class GvrAudioSoundfield : MonoBehaviour {
     mute = soundfieldMute;
     pitch = soundfieldPitch;
     priority = soundfieldPriority;
+    spatialBlend = soundfieldSpatialBlend;
     volume = soundfieldVolume;
+    dopplerLevel = soundfieldDopplerLevel;
+    minDistance = soundfieldMinDistance;
+    maxDistance = soundfieldMaxDistance;
+    rolloffMode = soundfieldRolloffMode;
   }
 
   /// Pauses playing the clip.
@@ -265,23 +375,45 @@ public class GvrAudioSoundfield : MonoBehaviour {
 
   /// Plays the clip.
   public void Play () {
-    if(audioSources != null && InitializeSoundfield()) {
-      double dspTime = AudioSettings.dspTime;
-      for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
-        audioSources[channelSet].PlayScheduled(dspTime);
-      }
-      isPaused = false;
-    }
+    double dspTime = AudioSettings.dspTime;
+    PlayScheduled(dspTime);
   }
 
   /// Plays the clip with a delay specified in seconds.
   public void PlayDelayed (float delay) {
-    if(audioSources != null && InitializeSoundfield()) {
-      double delayedDspTime = AudioSettings.dspTime + (double)delay;
+    double delayedDspTime = AudioSettings.dspTime + (double)delay;
+    PlayScheduled(delayedDspTime);
+  }
+
+  /// Plays the clip at a specific time on the absolute time-line that AudioSettings.dspTime reads
+  /// from.
+  public void PlayScheduled (double time) {
+    if (audioSources != null && InitializeSoundfield()) {
       for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
-        audioSources[channelSet].PlayScheduled(delayedDspTime);
+        audioSources[channelSet].PlayScheduled(time);
       }
       isPaused = false;
+    } else {
+      Debug.LogWarning ("GVR Audio soundfield not initialized. Audio playback not supported " +
+                        "until after Awake() and OnEnable(). Try calling from Start() instead.");
+    }
+  }
+
+  /// Changes the time at which a sound that has already been scheduled to play will end.
+  public void SetScheduledEndTime(double time) {
+    if (audioSources != null) {
+      for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
+        audioSources[channelSet].SetScheduledEndTime(time);
+      }
+    }
+  }
+
+  /// Changes the time at which a sound that has already been scheduled to play will start.
+  public void SetScheduledStartTime(double time) {
+    if (audioSources != null) {
+      for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
+        audioSources[channelSet].SetScheduledStartTime(time);
+      }
     }
   }
 
@@ -311,7 +443,7 @@ public class GvrAudioSoundfield : MonoBehaviour {
     if (id < 0) {
       id = GvrAudio.CreateAudioSoundfield();
       if (id >= 0) {
-        GvrAudio.UpdateAudioSoundfield(id, transform, gainDb);
+        GvrAudio.UpdateAudioSoundfield(id, this);
         for (int channelSet = 0; channelSet < audioSources.Length; ++channelSet) {
           InitializeChannelSet(audioSources[channelSet], channelSet);
         }
@@ -334,15 +466,25 @@ public class GvrAudioSoundfield : MonoBehaviour {
   // Initializes given channel set of the soundfield.
   private void InitializeChannelSet(AudioSource source, int channelSet) {
     source.spatialize = true;
-    source.SetSpatializerFloat(0, (float)id);
-    source.SetSpatializerFloat(1, (float)GvrAudio.SpatializerType.Soundfield);
-    source.SetSpatializerFloat(2, (float)GvrAudio.numFoaChannels);
-    source.SetSpatializerFloat(3, (float)channelSet);
+    source.SetSpatializerFloat((int) GvrAudio.SpatializerData.Type,
+                               (float) GvrAudio.SpatializerType.Soundfield);
+    source.SetSpatializerFloat((int) GvrAudio.SpatializerData.NumChannels,
+                               (float) GvrAudio.numFoaChannels);
+    source.SetSpatializerFloat((int) GvrAudio.SpatializerData.ChannelSet, (float) channelSet);
+    source.SetSpatializerFloat((int) GvrAudio.SpatializerData.Gain,
+                               GvrAudio.ConvertAmplitudeFromDb(gainDb));
+    source.SetSpatializerFloat((int) GvrAudio.SpatializerData.MinDistance, soundfieldMinDistance);
+    source.SetSpatializerFloat((int) GvrAudio.SpatializerData.ZeroOutput, 0.0f);
+    // Soundfield id must be set after all the spatializer parameters, to ensure that the soundfield
+    // is properly initialized before processing.
+    source.SetSpatializerFloat((int) GvrAudio.SpatializerData.Id, (float) id);
   }
 
   // Shuts down given channel set of the soundfield.
   private void ShutdownChannelSet(AudioSource source, int channelSet) {
-    source.SetSpatializerFloat(0, -1.0f);
+    source.SetSpatializerFloat((int) GvrAudio.SpatializerData.Id, -1.0f);
+    // Ensure that the output is zeroed after shutdown.
+    source.SetSpatializerFloat((int) GvrAudio.SpatializerData.ZeroOutput, 1.0f);
     source.spatialize = false;
   }
 }

@@ -18,7 +18,7 @@ public class SwitchTexture : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if (GvrViewer.Instance.Triggered && _tapCountdown <= 0)
+		if (_tapCountdown <= 0)
 		{
 			sphere.GetComponent<Renderer> ().material.mainTexture = textureArray[currTexture];
 			currTexture++;

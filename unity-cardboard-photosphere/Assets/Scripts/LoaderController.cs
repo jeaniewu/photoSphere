@@ -10,7 +10,7 @@ public class LoaderController : MonoBehaviour {
 		//StartCoroutine (loader());
 	}
 
-	private IEnumerator loader()
+	public IEnumerator loader()
 	{
 		for (int i = 0; i < spheres.Length; i++) {
 			yield return new WaitForSeconds (0.1f);

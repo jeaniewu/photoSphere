@@ -1,4 +1,4 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
 
 // Copyright 2015 Google Inc. All rights reserved.
 //
@@ -73,9 +73,12 @@ float4 undistortVertex(float4 pos) {
 }
 
 // Surface shader hides away the MVP multiplication, so we have
-// to multiply by _FixProjection = inverse(MVP)*_RealProjection.
+// to multiply by _FixProjection = inverse(VP)*_RealProjection
+// and then by inverse(M), in order to cancel it out and leave our
+// own transform in place.
 float4 undistortSurface(float4 pos) {
-  return mul(_FixProjection, undistort(pos));
+  float4 proj = mul(_FixProjection, undistort(pos));
+  return mul(unity_WorldToObject, proj);
 }
 
 #else
@@ -83,7 +86,7 @@ float4 undistortSurface(float4 pos) {
 
 // Just do the standard MVP transform.
 float4 undistortVertex(float4 pos) {
-  return UnityObjectToClipPos(pos);
+  return mul(UNITY_MATRIX_MVP, pos);
 }
 
 // Surface shader hides away the MVP multiplication, so just return pos.

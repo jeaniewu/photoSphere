@@ -30,9 +30,9 @@ public class Fading : MonoBehaviour {
 		}
 	}
 
-//	void OnTriggerEnter(Collider other) {		
-//		if (other.CompareTag("Sphere")){
-//			StartCoroutine (beginFade());
-//		}
-//	}
+	//	void OnTriggerEnter(Collider other) {		
+	//		if (other.CompareTag("Sphere")){
+	//			StartCoroutine (beginFade());
+	//		}
+	//	}
 }
