@@ -24,10 +24,9 @@ public class Move : MonoBehaviour {
 	}
 
 	void move(){
-		if (index > 3) {
-			transform.position = origin;
-			return;
-		}
+		if (index > spheres.Length)
+			index = 0;
+		
 		transform.position = spheres[index].transform.position;
 		index = (index + 1) % spheres.Length;
 	}
