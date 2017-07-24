@@ -3,7 +3,6 @@ using System.Collections;
 
 public class Move : MonoBehaviour {
 
-	private Vector3 origin;
 	public float speed = 100f;
 
 	public GameObject spheresObject;
@@ -15,7 +14,6 @@ public class Move : MonoBehaviour {
 	void Start () {
 		fade = GetComponent<Fading> ();
 		spheres = spheresObject.GetComponent<LoaderController> ().spheres;
-		origin = transform.position;
 	}
 
 	public void PointerDown(){
