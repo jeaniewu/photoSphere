@@ -5,15 +5,15 @@ public class AudioController : MonoBehaviour {
 
 	public bool isNarrativePlaying = false;
 
-	void OnTriggerEnter(Collider other) {		
-		if (other.CompareTag("Sphere")){
+	public void OnTriggerEnter(Collider other) {
 			// Play Narrative
-			AudioSource narrative = other.GetComponentsInChildren<AudioSource> ()[0];
-			AudioSource background = other.GetComponentsInChildren<AudioSource> ()[1];
+		if (!isNarrativePlaying) {
+			AudioSource narrative = other.GetComponentsInChildren<AudioSource> () [0];
+			AudioSource background = other.GetComponentsInChildren<AudioSource> () [1];
 
-			narrative.Play();
+			narrative.Play ();
 			isNarrativePlaying = true;
-			StartCoroutine(waitForNarrative(narrative, background));
+			StartCoroutine (waitForNarrative (narrative, background));
 
 			//Play Background noise, lowered volume when narrative is playing
 			background.volume = 0.3f;
@@ -21,11 +21,11 @@ public class AudioController : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerExit(Collider other) {
-		if (other.CompareTag("Sphere")){
+	public void OnTriggerExit(Collider other) {
 			// Disable audio when exiting sphere
-			other.GetComponentsInChildren<AudioSource> ()[0].Stop ();
-			other.GetComponentsInChildren<AudioSource> ()[1].Stop ();
+		if (!isNarrativePlaying) {
+			other.GetComponentsInChildren<AudioSource> () [0].Stop ();
+			other.GetComponentsInChildren<AudioSource> () [1].Stop ();
 		}
 	}
 

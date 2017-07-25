@@ -9,24 +9,28 @@ public class Move : MonoBehaviour {
 	public int index = 0;
 
 	private GameObject[] spheres;
+	private AudioController audio;
 	private Fading fade;
 
 	void Start () {
 		fade = GetComponent<Fading> ();
 		spheres = spheresObject.GetComponent<LoaderController> ().spheres;
+		audio = GetComponent<AudioController> ();
 	}
 
 	public void PointerDown(){
-		StartCoroutine (fade.beginFade());
-		Invoke ("move", 0.5f);
+		if (!audio.isNarrativePlaying) {
+			StartCoroutine (fade.beginFade ());
+			Invoke ("move", 0.5f);
+		}
 	}
 
 	void move(){
-		if (index > spheres.Length)
-			index = 0;
+			if (index > spheres.Length)
+				index = 0;
 		
-		transform.position = spheres[index].transform.position;
-		index = (index + 1) % spheres.Length;
+			transform.position = spheres [index].transform.position;
+			index = (index + 1) % spheres.Length;
 	}
 
 	//	IEnumerator move(){
